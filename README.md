@@ -62,13 +62,15 @@ Only scalar values are stored on the route action, so breadcrumbs work with `php
 
 ### Rendering
 
-Include the bundled view wherever you want the trail to appear, typically in a layout:
+Include the bundled view in your page layout or a regular Blade view:
 
 ```blade
 @include('flux-breadcrumbs::breadcrumbs')
 ```
 
 The view resolves the trail from the current request's route, so nothing needs to be passed in. Routes without a breadcrumb definition render nothing.
+
+When using Livewire, place the include in the page layout, outside the component's re-rendered view. During component updates, the current request belongs to Livewire's update endpoint rather than the original page route. That endpoint normally has no breadcrumb definition, so breadcrumbs included inside the component disappear after an update. The package does not preserve the original page-route context.
 
 ### Dynamic labels
 
@@ -81,7 +83,22 @@ Labels may contain placeholders in curly braces. They are resolved against the b
 
 Placeholders that cannot be resolved are replaced with an empty string.
 
-Parent URLs are generated with `route()` using only the parameters the parent route itself declares, so nested resource routes work out of the box.
+Resolved values are cast directly to strings and must be scalar or stringable. Enum instances cannot be cast to strings: use `.value` for a backed enum's value or `.name` for its case name. This applies both to implicitly bound route enums and enum-valued model attributes:
+
+```php
+->breadcrumb('{status.value}')
+->breadcrumb('{post.status.name}')
+```
+
+Using `{status}` or `{post.status}` when the value is an enum throws an `Error` during rendering.
+
+### Parent route parameters
+
+Parent URLs are generated with `route()` using only current-route parameters whose names match parameters declared by the parent route. Nested resource routes work when the required parent parameters are available under the same names, or supplied by Laravel URL defaults.
+
+The package does not infer missing parameters from model relationships or support parameter mappings. For example, a shallow child route `/tasks/{task}` cannot link to a breadcrumb parent `/projects/{project}/tasks` unless `project` is otherwise supplied, even if the bound task has a `project` relationship. A missing required parameter causes an `Illuminate\Routing\Exceptions\UrlGenerationException` during rendering.
+
+Use a nested child route such as `/projects/{project}/tasks/{task}`, choose a parent whose parameters are available, or configure the required Laravel URL defaults.
 
 ### Icons
 
