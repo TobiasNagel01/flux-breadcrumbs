@@ -141,6 +141,10 @@ If you prefer to build your own markup, inject `TobiasNagel\FluxBreadcrumbs\Brea
   - a route in the parent chain has no breadcrumb definition,
   - the parent chain contains a cycle.
 
+## AI agent support (Laravel Boost)
+
+The package ships a [Laravel Boost](https://laravel.com/docs/boost) skill (`flux-breadcrumbs-development`) and a short guideline under `resources/boost/`. When this package is a direct dependency of your application and you run `php artisan boost:install` or `php artisan boost:update`, Boost installs the skill for your coding agent (for example into `.claude/skills/`) and includes the guideline in the generated agent instructions. No configuration is required.
+
 ## License
 
 MIT
