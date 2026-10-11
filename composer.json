@@ -3,7 +3,12 @@
     "description": "Route-driven breadcrumbs for Laravel applications rendered with Flux UI.",
     "type": "library",
     "license": "MIT",
-    "keywords": ["laravel", "livewire", "flux", "breadcrumbs"],
+    "keywords": [
+        "laravel",
+        "livewire",
+        "flux",
+        "breadcrumbs"
+    ],
     "require": {
         "php": "^8.4",
         "illuminate/contracts": "^13.0",
@@ -27,5 +32,18 @@
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TobiasNagel\\FluxBreadcrumbs\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "XDEBUG_MODE=coverage phpunit --coverage-text"
+    }
 }

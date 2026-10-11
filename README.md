@@ -145,6 +145,19 @@ If you prefer to build your own markup, inject `TobiasNagel\FluxBreadcrumbs\Brea
 
 The package ships a [Laravel Boost](https://laravel.com/docs/boost) skill (`flux-breadcrumbs-development`) and a short guideline under `resources/boost/`. When this package is a direct dependency of your application and you run `php artisan boost:install` or `php artisan boost:update`, Boost installs the skill for your coding agent (for example into `.claude/skills/`) and includes the guideline in the generated agent instructions. No configuration is required.
 
+## Testing
+
+```bash
+composer test
+composer test-coverage
+```
+
+The coverage script needs Xdebug (or PCOV) to be loaded. With Laravel Herd, Xdebug is not enabled by default; pass it explicitly:
+
+```bash
+XDEBUG_MODE=coverage php -d zend_extension=/Applications/Herd.app/Contents/Resources/xdebug/xdebug-84-arm64.so vendor/bin/phpunit --coverage-text
+```
+
 ## License
 
 MIT

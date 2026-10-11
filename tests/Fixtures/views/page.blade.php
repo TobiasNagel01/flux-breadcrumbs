@@ -1,0 +1,1 @@
+@include('flux-breadcrumbs::breadcrumbs')
