@@ -2,10 +2,13 @@
 
 namespace TobiasNagel\FluxBreadcrumbs;
 
+use BackedEnum;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use LogicException;
+use Stringable;
+use UnitEnum;
 
 /**
  * Resolves the breadcrumb trail for a route configured via the `Route::breadcrumb()` macro.
@@ -91,9 +94,20 @@ class BreadcrumbResolver
     {
         return (string) preg_replace_callback(
             '/\{([a-zA-Z0-9_.]+)\}/',
-            fn (array $matches): string => (string) data_get($parameters, $matches[1], ''),
+            fn (array $matches): string => $this->stringify(data_get($parameters, $matches[1])),
             $label,
         );
+    }
+
+    private function stringify(mixed $value): string
+    {
+        return match (true) {
+            $value instanceof BackedEnum => (string) $value->value,
+            $value instanceof UnitEnum => $value->name,
+            $value instanceof Stringable => (string) $value,
+            is_scalar($value) => (string) $value,
+            default => '',
+        };
     }
 
     /**
