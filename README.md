@@ -83,6 +83,8 @@ Labels may contain placeholders in curly braces. They are resolved against the b
 
 Placeholders that cannot be resolved are replaced with an empty string.
 
+Relationships that are not loaded yet are eager-loaded explicitly when the label is resolved. This works with `Model::preventLazyLoading()` enabled, but costs one query per unloaded relationship, so eager-load relationships you use in labels where that matters.
+
 Scalar and stringable values are converted to strings. Backed enums resolve to their backing value, while unit enums resolve to their case name. Other values are replaced with an empty string. Enum handling applies to both implicitly bound route enums and enum-valued model attributes:
 
 ```php

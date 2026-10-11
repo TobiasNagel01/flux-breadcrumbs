@@ -3,6 +3,7 @@
 namespace TobiasNagel\FluxBreadcrumbs;
 
 use BackedEnum;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -94,9 +95,52 @@ class BreadcrumbResolver
     {
         return (string) preg_replace_callback(
             '/\{([a-zA-Z0-9_.]+)\}/',
-            fn (array $matches): string => $this->stringify(data_get($parameters, $matches[1])),
+            fn (array $matches): string => $this->stringify($this->resolvePath($parameters, $matches[1])),
             $label,
         );
+    }
+
+    /**
+     * Walks a dot-notation path. Relationships on Eloquent models that are not loaded yet are
+     * eager-loaded explicitly, so the lookup does not trip `Model::preventLazyLoading()`.
+     */
+    private function resolvePath(mixed $target, string $path): mixed
+    {
+        foreach (explode('.', $path) as $segment) {
+            $target = $target instanceof Model
+                ? $this->resolveModelSegment($target, $segment)
+                : data_get($target, $segment);
+
+            if ($target === null) {
+                return null;
+            }
+        }
+
+        return $target;
+    }
+
+    private function resolveModelSegment(Model $model, string $segment): mixed
+    {
+        if (
+            array_key_exists($segment, $model->getAttributes())
+            || $model->hasGetMutator($segment)
+            || $model->hasAttributeMutator($segment)
+            || $model->hasCast($segment)
+        ) {
+            return $model->getAttribute($segment);
+        }
+
+        if ($model->relationLoaded($segment)) {
+            return $model->getRelation($segment);
+        }
+
+        if ($model->isRelation($segment)) {
+            $model->load($segment);
+
+            return $model->getRelation($segment);
+        }
+
+        return null;
     }
 
     private function stringify(mixed $value): string
