@@ -83,14 +83,14 @@ Labels may contain placeholders in curly braces. They are resolved against the b
 
 Placeholders that cannot be resolved are replaced with an empty string.
 
-Resolved values are cast directly to strings and must be scalar or stringable. Enum instances cannot be cast to strings: use `.value` for a backed enum's value or `.name` for its case name. This applies both to implicitly bound route enums and enum-valued model attributes:
+Scalar and stringable values are converted to strings. Backed enums resolve to their backing value, while unit enums resolve to their case name. Other values are replaced with an empty string. Enum handling applies to both implicitly bound route enums and enum-valued model attributes:
 
 ```php
-->breadcrumb('{status.value}')
-->breadcrumb('{post.status.name}')
+->breadcrumb('{status}')
+->breadcrumb('{post.status}')
 ```
 
-Using `{status}` or `{post.status}` when the value is an enum throws an `Error` during rendering.
+You can also explicitly select `.value` for a backed enum's value or `.name` for any enum's case name, for example `{status.value}` or `{post.status.name}`.
 
 ### Parent route parameters
 
